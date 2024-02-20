@@ -177,7 +177,7 @@ function Chat() {
     }
   };
 
-  return (
+   return (
     <div className="" id="ChatAnonim">
       <div className="text-center text-4xl font-semibold" id="Glow">
         Text Anonim
