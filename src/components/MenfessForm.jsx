@@ -1,48 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../firebase";
 
 const MenfessForm = () => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [message, setMessage] = useState("");
-  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
-  const [userIp, setUserIp] = useState("");
-
-  const messagesEndRef = useRef(null);
-
-  useEffect(() => {
-    getUserIp();
-    scrollToBottom();
-  }, []);
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-    }, 100);
-  };
-
-  const getUserIp = async () => {
-    try {
-      const cachedIp = localStorage.getItem("userIp");
-      if (cachedIp) {
-        setUserIp(cachedIp);
-        return;
-      }
-
-      const response = await axios.get("https://ipapi.co/json");
-      const newUserIp = response.data.ip;
-      setUserIp(newUserIp);
-
-      const expirationTime = new Date().getTime() + 60 * 60 * 1000; // 1 hour
-      localStorage.setItem("userIp", newUserIp);
-      localStorage.setItem("ipExpiration", expirationTime.toString());
-    } catch (error) {
-      console.error("Failed to get IP address:", error);
-    }
-  };
 
   const sendMessage = async () => {
     if (from.trim() === "" || to.trim() === "" || message.trim() === "") {
@@ -59,14 +21,6 @@ const MenfessForm = () => {
     }
 
     try {
-      // Menambahkan pesan ke koleksi "menfess" di Firebase Firestore
-      await addDoc(collection(db, "menfess"), {
-        from: from,
-        to: to,
-        message: message,
-        timestamp: new Date(),
-      });
-
       // Reset field formulir setelah pengiriman
       setFrom("");
       setTo("");
@@ -88,20 +42,13 @@ const MenfessForm = () => {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
   return (
     <div>
       <div className="text-center text-2xl font-semibold mb-2 text-white" id="Glow">
         Menfess Form
       </div>
-
       <div id="FormMenfess" className="flex flex-col mt-5">
+ <form>
   <div className="flex items-center mb-4">
     <img src="/user-solid.svg" alt="From Image" className="h-6 w-6 mr-2" />
     <label htmlFor="from" className="text-white w-20 mb-2">From :</label>
@@ -136,7 +83,7 @@ const MenfessForm = () => {
       className="bg-transparent border-b-2 border-white text-white p-1 flex-grow"
     />
   </div>
-
+  </form>
   <button onClick={sendMessage} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
     Submit
   </button>
